@@ -1,10 +1,10 @@
 const googleTrends = require("google-trends-api");
 
-const daily = (geo = "id", date = null) => {
+async function daily(geo = "id", date = null) {
 
     if (date == null) date = new Date().toISOString().slice(0, 10);
 
-    googleTrends.dailyTrends(
+    const google = await googleTrends.dailyTrends(
         {
             trendDate: new Date(date),
             geo: geo.toUpperCase(),
@@ -13,7 +13,7 @@ const daily = (geo = "id", date = null) => {
             if (error) {
                 return {
                     status: false,
-                    data: null
+                    error: "Server error: " + error
                 };
             } else {
                 return {
@@ -23,32 +23,28 @@ const daily = (geo = "id", date = null) => {
             }
         }
     );
-};
 
-const realtime = (geo = "id", category = "all") => {
-
-    googleTrends.realTimeTrends(
-        {
-            geo: geo.toUpperCase(),
-            category: category,
-        },
-        function (error, response) {
-            if (error) {
-                return {
-                    status: false,
-                    data: null
-                };
-            } else {
-                return {
-                    status: true,
-                    data: JSON.parse(response)
-                }
-            }
+    if (google.status) {
+        return {
+            source: google.data.default.rssFeedPageUrl,
+            trending: google.data.default.trendingSearchesDays.flatMap(day =>
+                day.trendingSearches.map(search => ({
+                    query: search.title.query,
+                    traffic: search.formattedTraffic,
+                    articles: search.articles.map(article => ({
+                        title: article.title,
+                        timeAgo: article.timeAgo,
+                        source: article.source,
+                        url: article.url
+                    }))
+                }))
+            )
         }
-    );
-};
+    }
+
+    return google.error
+}
 
 module.exports = {
-    daily,
-    realtime,
+    daily
 };
