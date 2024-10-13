@@ -1,5 +1,5 @@
 {
-  "name": "my-project",
+  "name": "google-trend-api",
   "version": 2,
   "builds": [
     {
