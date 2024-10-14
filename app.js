@@ -1,6 +1,7 @@
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const cors = require('cors');
 
 var indexRouter = require('./routes');
 var trendsRouter = require('./routes/trends');
@@ -11,6 +12,16 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
+
+const corsOptions = {
+    // origin: env == "development" ? ["*"] : listOrigin,
+    origin: ["*"],
+    method: ['GET', 'POST', 'PUT', 'DELETE'],
+    optionsSuccessStatus: 200,
+    credentials: true
+}
+
+app.use(cors(corsOptions));
 
 app.use('/', indexRouter);
 app.use('/api', trendsRouter);
