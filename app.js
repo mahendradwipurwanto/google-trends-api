@@ -18,7 +18,7 @@ const corsOptions = {
     origin: ["*"],
     method: ['GET', 'POST', 'PUT', 'DELETE'],
     optionsSuccessStatus: 200,
-    credentials: true
+    credentials: false
 }
 
 app.use(cors(corsOptions));
