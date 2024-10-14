@@ -17,6 +17,7 @@
     "express": "^4.17.1",
     "google-trends-api": "^4.9.0",
     "morgan": "~1.9.1",
-    "nodemon": "^2.0.6"
+    "nodemon": "^2.0.6",
+    "open-google-translator": "^1.0.5"
   }
 }
