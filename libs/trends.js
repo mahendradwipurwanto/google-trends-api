@@ -1,7 +1,8 @@
 const googleTrends = require("google-trends-api");
-const { translate_text } = require("./translate");
+const {translate_text} = require("./translate");
+const {fetchGoogleTrendsRSS} = require("./rss-scapper");
 
-const foreign = ["th", "sa", "ua", "qa"];
+const foreign = ["th", "sa", "ua", "qa", "kz"];
 
 async function daily(geo = "id", date = null) {
     if (date == null) date = new Date().toISOString().slice(0, 10);
@@ -13,11 +14,12 @@ async function daily(geo = "id", date = null) {
             geo: geo.toUpperCase(),
         });
 
+        //check if response is html
+        if (response.includes("<html "))
+            return fetchGoogleTrendsRSS(geo);
+
         const googleData = JSON.parse(response);
         const translated = foreign.includes(geo);
-
-        // Translate test word "บอยปกรณ์" (optional check)
-        console.log(await translate_text("บอยปกรณ์", geo));
 
         // Process trending searches and articles
         const trendingData = await Promise.all(
@@ -56,12 +58,13 @@ async function daily(geo = "id", date = null) {
         const flattenedTrendingData = trendingData.flat();
 
         return {
+            status: 200,
             source: googleData.default.rssFeedPageUrl,
             trending: flattenedTrendingData,
         };
     } catch (error) {
         return {
-            status: false,
+            status: 500,
             error: "Server error: " + error.message,
         };
     }
